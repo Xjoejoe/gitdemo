@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+</head>
+<body>
+  <script>
+    const MAX_LEVEL = 16;
+    class Node{
+      constructor({
+        data=-1,// data属性存放了每个节点的数据
+        maxLevel = 0, // maxLevel属性表明了当前节点处于整个跳表索引的级数
+
+        // refer是一个有着MAX_LEVEL大小的数组，refer属性存放着很多个索引
+        // 如果用p表示当前节点，用level表示这个节点处于整个跳表索引的级数；那么p[level]表示在level这一层级p节点的下一个节点
+        // p[level-n]表示level级下面n级的节点
+        refer = new Array(MAX_LEVEL)
+      }={}){
+        this.data = data;
+        this.maxLevel = maxLevel;
+        this.refer = refer;
+      }
+    }
+
+    class SkipList{
+      constructor(){
+        this.head = new Node();
+        this.levelCount = 1;// levelCount属性表示了当前跳表索引的总共级数
+      }
+
+      randomLeval(){
+        let level = 1;
+        for(let i = 0;i<MAX_LEVEL;i++){
+          if(Math.random()<0.5){
+            level++;
+          }
+        }
+        return level;
+      }
+
+      insert(value){
+        let level = this.randomLeval();
+        let newNode = new Node();
+        newNode.maxLevel = level;
+        newNode.data = value;
+        const update = new Array(level).fill(newNode);
+        let p = this.head;
+        for(let i = level-1;i>=0;i--){
+          while(q[i].refer!==void(0)&&q[i].data<value){
+            p=p.refer[i];
+          }
+          update[i] = p;
+        }
+        for(let i = 0;i<level;i++){
+          newNode.refer[i] = update[i];
+          update[i].refer[i] = newNode;
+        }
+        if(this.levelCount<level){
+          this.levelCount = level;
+        }
+      }
+
+      find(value){
+        if(!value){return;}
+        let p = this.head;
+        let levelCount = this.levelCount;
+        for(let i = levelCount-1;i>=0;i--){
+          while(p.refer[i]!==void(0)&&p.refer[i].data<value){
+            p = p.refer[i];
+          }
+        }
+        if(p.refer[0]!==void(0)&&p.refer[0].data===value){
+          return p.refer[0]
+        }
+        return null;
+      }
+    }
+  </script>
+</body>
+</html>
